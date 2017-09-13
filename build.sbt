@@ -20,18 +20,14 @@ assemblyMergeStrategy in assembly := {
 }
 
 dockerfile in docker := {
-  val artifact: File = assembly.value
-  val artifactTargetPath = s"/app/${artifact.name}"
-
+  val applicationFolder = "/app"
+  val startScript = s"$applicationFolder/start.sh"
   new Dockerfile {
     from("java")
-    copy(artifact, artifactTargetPath)
-    entryPoint(
-      "java",
-      "-Dplay.http.secret.key=${PLAY_HTTP_SECRET_KEY}",
-      "-jar",
-      artifactTargetPath
-    )
+    copy(assembly.value, s"$applicationFolder/application.jar")
+    copy(file("./start.sh"), startScript)
+    run("chmod", "+x", s"$startScript")
+    cmd(startScript)
     expose(9000)
   }
 }
