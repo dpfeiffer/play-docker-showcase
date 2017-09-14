@@ -20,15 +20,13 @@ assemblyMergeStrategy in assembly := {
 }
 
 dockerfile in docker := {
-  val applicationFolder = "/app"
-  val startScript = s"$applicationFolder/start.sh"
   new Dockerfile {
-    from("java")
-    copy(assembly.value, s"$applicationFolder/application.jar")
-    copy(file("./start.sh"), startScript)
-    run("chmod", "+x", s"$startScript")
-    cmd(startScript)
+    from("anapsix/alpine-java:8u141b15_jdk")
+    copy(assembly.value, "/app/assembly.jar")
+    copy(file("./start.sh"), "/app/start.sh")
+    run("chmod", "+x", "/app/start.sh")
     expose(9000)
+    cmd("/app/start.sh")
   }
 }
 
